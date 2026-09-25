@@ -1,5 +1,10 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 public class Git {
 
@@ -22,9 +27,28 @@ public class Git {
             } else {
                 System.out.println("Git Repository created.");
             }
+            System.out.println("== Testing fileHash ==");
+            System.out.println(hashFile("test.txt"));
         } catch (IOException e) {
             System.out.println("File error: " + e.getMessage());
         }
 
+    }
+
+    public static String hashFile(String filePath) throws IOException {
+        Path path = Path.of(filePath);
+        if (!Files.isRegularFile(path)) {
+            throw new IOException("no such file: " + filePath);
+        }
+        byte[] fileBytes = Files.readAllBytes(path);
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-1 is not available", e);
+        }
+
+        byte[] hash = digest.digest(fileBytes);
+        return HexFormat.of().formatHex(hash);
     }
 }
