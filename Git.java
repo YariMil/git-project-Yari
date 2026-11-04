@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -292,7 +294,6 @@ public class Git {
     }
 
     // This method creates a tree object that represents the directory
-    //
     // git-project-Yari/dirPath
     // it takes in the path of the directory and an ArrayList that stores the direct
     // children of dirPath
@@ -413,40 +414,19 @@ public class Git {
     // from the staged files
     // it returns the hash of the tree
     public static String createTreeFromIndex() {
-
-        // Read index into an ArrayList
-        // create the workingList by adding the "blob" prefix and sorting alphabeticaly
-        // by path
         ArrayList<String> workingList = buildWorkingList();
-
-        // if there are no staged files, return an empty String
         if (workingList.isEmpty()) {
             return "";
         }
+        String root = findDeepestDirectory(workingList);
 
-        // find the deepest directory
-        String deepestDir = findDeepestDirectory(workingList);
-
-        // keep looping as long as the deepest directory isn't an empty String
-        // when deepestDir is an empty String, it represents the repository root.
-        // Therefore, there are no deeper directories left to compress, so we can create
-        // the final root tree
-        while (!deepestDir.equals("")) {
-
-            // call createTree(workingList, deepestDir)
-            String treeHash = createTree(workingList, deepestDir);
-
-            // remove the children of deepestDir
-            // add the new tree to entry
-            collapseDirectory(workingList, deepestDir, treeHash);
-
-            // find the new deepest directory that needs to be compressed, and update
-            // deepestDir
-            deepestDir = findDeepestDirectory(workingList);
+        while (!root.equals("") && !root.equals("git-project-Yari")) {
+            String treeHash = createTree(workingList, root);
+            collapseDirectory(workingList, root, treeHash);
+            root = findDeepestDirectory(workingList);
         }
 
-        // return the hash of the final tree
-        return createTree(workingList, "");
+        return createTree(workingList, "git-project-Yari");
     }
 
     // this method looks inside of index and builds the working list
@@ -1051,7 +1031,44 @@ public class Git {
 
         System.out.println("Same root hash on second run: " + finalTreeHash.equals(secondTreeHash));
 
-        cleanUp();
+        // cleanUp();
+        System.out.println();
+        System.out.println("== Testing commit() ==");
+
+        String firstCommit = commit("Yari", "First commit");
+
+        System.out.println("First commit hash: " + firstCommit);
+
+        BufferedReader commitReader = new BufferedReader(new FileReader("git/objects/" + firstCommit));
+        String commitLine;
+
+        while ((commitLine = commitReader.readLine()) != null) {
+            System.out.println(commitLine);
+        }
+
+        commitReader.close();
+
+        BufferedReader headCheck = new BufferedReader(new FileReader("git/HEAD"));
+        System.out.println("HEAD matches first commit: " + headCheck.readLine().equals(firstCommit));
+        headCheck.close();
+
+        System.out.println();
+
+        String secondCommit = commit("Yari", "Second commit");
+
+        System.out.println("Second commit hash: " + secondCommit);
+
+        commitReader = new BufferedReader(new FileReader("git/objects/" + secondCommit));
+
+        while ((commitLine = commitReader.readLine()) != null) {
+            System.out.println(commitLine);
+        }
+
+        commitReader.close();
+
+        headCheck = new BufferedReader(new FileReader("git/HEAD"));
+        System.out.println("HEAD matches second commit: " + headCheck.readLine().equals(secondCommit));
+        headCheck.close();
     }
 
     public static boolean checkIfGitExists() throws IOException {
@@ -1097,6 +1114,49 @@ public class Git {
         }
         testingDirectory.delete();
 
+    }
+
+    public static String commit(String author, String message) throws IOException {
+
+        String rootTreeHash = createTreeFromIndex();
+
+        if (rootTreeHash.equals("")) {
+            System.out.println("Nothing staged, no commit created.");
+            return "";
+        }
+
+        BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
+        String parentHash = headReader.readLine();
+        headReader.close();
+
+        StringBuilder commitContents = new StringBuilder();
+
+        commitContents.append("tree: " + rootTreeHash + "\n");
+
+        if (parentHash != null && !parentHash.equals("")) {
+            commitContents.append("parent: " + parentHash + "\n");
+        }
+
+        commitContents.append("author: " + author + "\n");
+        commitContents.append("date: " + LocalDateTime.now() + "\n");
+        commitContents.append("message: " + message + "\n");
+
+        File commitFile = new File("commitContents");
+        FileWriter commitWriter = new FileWriter(commitFile);
+        commitWriter.write(commitContents.toString());
+        commitWriter.close();
+
+        String commitHash = hashFile("commitContents");
+
+        createBlobs("commitContents");
+
+        commitFile.delete();
+
+        FileWriter headWriter = new FileWriter("git/HEAD");
+        headWriter.write(commitHash);
+        headWriter.close();
+
+        return commitHash;
     }
 
 }
