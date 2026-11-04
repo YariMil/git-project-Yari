@@ -35,7 +35,18 @@ public class Git {
             boolean indexExists = !gitIndex.createNewFile();
             File gitHead = new File("git/HEAD");
             boolean headExists = !gitHead.createNewFile();
-            if (rootExists && objectsExists && indexExists && headExists) {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter("git/HEAD"));
+                bw.write("ref: refs/heads/main");
+                bw.close();
+            } catch (Exception e) {
+                System.out.println("Error with writing in HEAD in init: " + e.getMessage());
+            }
+            File gitRefs = new File("git/refs/heads/main");
+            new File("git/refs").mkdir();
+            new File("git/refs/heads").mkdir();
+            boolean refsExists = !gitRefs.createNewFile();
+            if (rootExists && objectsExists && indexExists && headExists && refsExists) {
                 System.out.println("Git Repository already exists.");
             } else {
                 System.out.println("Git Repository created.");
