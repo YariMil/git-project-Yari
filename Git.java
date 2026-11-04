@@ -596,21 +596,23 @@ public class Git {
 
         br.close();
 
-        testGit.delete();
+        // testGit.delete();
 
         System.out.println();
 
         System.out.println("== Testing createTree() ==");
 
-        ArrayList<String> workingList = new ArrayList<>();
+        // var workingList = Files.readAllLines(Path.of("git/index"));
 
-        workingList.add("blob abc123 project/docs/Hello.txt");
-        workingList.add("blob def456 project/docs/World.txt");
-        workingList.add("blob ghi789 project/Main.java");
+        // ArrayList<String> workingListFormatted = new ArrayList<String>(workingList);
 
-        System.out.println(createTree(workingList, "project/docs"));
+        // workingList.add("blob abc123 project/docs/Hello.txt");
+        // workingList.add("blob def456 project/docs/World.txt");
+        // workingList.add("blob ghi789 project/Main.java");
 
-        cleanUp();
+        // System.out.println(createTree(workingList, "project/docs"));
+
+        // cleanUp();
 
     }
 
