@@ -1088,31 +1088,31 @@ public class Git {
     }
 
     public static void cleanUp() {
-        File git = new File("git");
-        File gitObjects = new File("git/objects");
-        File[] objectFiles = gitObjects.listFiles();
-        for (int i = 0; i < objectFiles.length; i++) {
-            objectFiles[i].delete();
-        }
-        File gitIndex = new File("git/index");
-        File gitHead = new File("git/HEAD");
-        File test = new File("test.txt");
-        File hello = new File("Hello.txt");
-        File duplicateHelloFile = new File("Hello1.txt");
-        File testingDirectory = new File("TestingDirectory");
-        gitObjects.delete();
-        gitIndex.delete();
-        gitHead.delete();
-        git.delete();
-        test.delete();
-        hello.delete();
-        duplicateHelloFile.delete();
+        // File git = new File("git");
+        // File gitObjects = new File("git/objects");
+        // File[] objectFiles = gitObjects.listFiles();
+        // for (int i = 0; i < objectFiles.length; i++) {
+        // objectFiles[i].delete();
+        // }
+        // File gitIndex = new File("git/index");
+        // File gitHead = new File("git/HEAD");
+        // File test = new File("test.txt");
+        // File hello = new File("Hello.txt");
+        // File duplicateHelloFile = new File("Hello1.txt");
+        // File testingDirectory = new File("TestingDirectory");
+        // gitObjects.delete();
+        // gitIndex.delete();
+        // gitHead.delete();
+        // git.delete();
+        // test.delete();
+        // hello.delete();
+        // duplicateHelloFile.delete();
 
-        File[] testingDirectoryFiles = testingDirectory.listFiles();
-        for (int i = 0; i < testingDirectoryFiles.length; i++) {
-            testingDirectoryFiles[i].delete();
-        }
-        testingDirectory.delete();
+        // File[] testingDirectoryFiles = testingDirectory.listFiles();
+        // for (int i = 0; i < testingDirectoryFiles.length; i++) {
+        // testingDirectoryFiles[i].delete();
+        // }
+        // testingDirectory.delete();
 
     }
 
@@ -1139,7 +1139,7 @@ public class Git {
 
         commitContents.append("author: " + author + "\n");
         commitContents.append("date: " + LocalDateTime.now() + "\n");
-        commitContents.append("message: " + message + "\n");
+        commitContents.append("message: " + message);
 
         File commitFile = new File("commitContents");
         FileWriter commitWriter = new FileWriter(commitFile);
