@@ -55,7 +55,7 @@ public class GitWrapper {
      * @param commitHash The SHA-1 hash of the commit to check out.
      */
     public static void checkout(String commitHash) {
-        // implement here
+        Git.restoreHistory(commitHash);
     }
 
 }
