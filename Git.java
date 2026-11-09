@@ -1214,7 +1214,7 @@ public class Git {
             return "";
         }
 
-        String hashAndCommit = getCurrentCommitHash();
+        String hashAndCommit = getBranchAndHash();
         String[] stringParts = hashAndCommit.split(" ");
         String currBranch = stringParts[0];
         String parentHash = stringParts[1];
@@ -1249,7 +1249,7 @@ public class Git {
         return commitHash;
     }
 
-    public static String getCurrentCommitHash() {
+    public static String getBranchAndHash() {
         try {
             BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
             String refBranch = headReader.readLine();
@@ -1266,5 +1266,26 @@ public class Git {
             System.out.println("Error in getCurrentCommitHash: " + e.getMessage());
         }
         return "";
+    }
+
+    public static String getCurrentCommitHash() {
+        String branchAndHash = getBranchAndHash();
+        String[] stringParts = branchAndHash.split(" ");
+        return stringParts[1];
+    }
+
+    public static void createBranch(String newBranch) {
+        String currHash = getCurrentCommitHash();
+        try {
+            BufferedWriter branchWriter = new BufferedWriter(new FileWriter("git/refs/heads/" + newBranch));
+            branchWriter.write(currHash);
+            BufferedWriter headWriter = new BufferedWriter(new FileWriter("git/HEAD"));
+            headWriter.write("ref: refs/heads/" + newBranch);
+            branchWriter.close();
+            headWriter.close();
+        } catch (Exception e) {
+            System.out.println("Error in createBranch: " + e.getMessage());
+        }
+
     }
 }
