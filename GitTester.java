@@ -19,7 +19,7 @@ public class GitTester {
             // GitWrapper.add("myProgram/Test/test.txt");
             // GitWrapper.add("myProgram/Hello.txt");
             hash = GitWrapper.commit("John Doe", "Second commit");
-            Git.createBranch("Wow");
+            Branches.createBranch("Wow");
             GitWrapper.commit("John Doe", "This is a commit on a new branch!");
             // System.out.println("Commit: " + hash);
             // bw = new BufferedWriter(new FileWriter("myProgram/Test/newThing.txt"));
