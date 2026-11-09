@@ -1213,15 +1213,16 @@ public class Git {
             return "";
         }
 
-        BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
-        String parentHash = headReader.readLine();
-        headReader.close();
+        String hashAndCommit = getCurrentCommitHash();
+        String[] stringParts = hashAndCommit.split(" ");
+        String currBranch = stringParts[0];
+        String parentHash = stringParts[1];
 
         StringBuilder commitContents = new StringBuilder();
 
         commitContents.append("tree: " + rootTreeHash + "\n");
 
-        if (parentHash != null && !parentHash.equals("")) {
+        if (!parentHash.equals("null") && !parentHash.equals("")) {
             commitContents.append("parent: " + parentHash + "\n");
         }
 
@@ -1240,11 +1241,29 @@ public class Git {
 
         commitFile.delete();
 
-        FileWriter headWriter = new FileWriter("git/HEAD");
+        FileWriter headWriter = new FileWriter("git/" + currBranch);
         headWriter.write(commitHash);
         headWriter.close();
 
         return commitHash;
     }
 
+    public static String getCurrentCommitHash() {
+        try {
+            BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
+            String refBranch = headReader.readLine();
+            int spaceIndex = refBranch.indexOf(" ");
+            String currBranch = refBranch.substring(spaceIndex + 1);
+            BufferedReader branchReader = new BufferedReader(new FileReader("git/" + currBranch));
+            String parentHash = branchReader.readLine();
+            headReader.close();
+            branchReader.close();
+            // Returning both the branch name and the commit hash. The branch name is used
+            // in commit
+            return currBranch + " " + parentHash;
+        } catch (Exception e) {
+            System.out.println("Error in getCurrentCommitHash: " + e.getMessage());
+        }
+        return "";
+    }
 }

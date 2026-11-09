@@ -6,19 +6,19 @@ public class GitTester {
     public static void main(String[] args) throws IOException {
         GitWrapper.init();
         try {
-            // BufferedWriter bw = new BufferedWriter(new FileWriter("myProgram/Test/test.txt"));
-            // bw.write("I am testing this!");
-            // bw.close();
-            // GitWrapper.add("myProgram/Test/test.txt");
-            // GitWrapper.add("myProgram/Hello.txt");
-            // String hash = GitWrapper.commit("John Doe", "Initial commit");
+            BufferedWriter bw = new BufferedWriter(new FileWriter("myProgram/Test/test.txt"));
+            bw.write("I am testing this!");
+            bw.close();
+            GitWrapper.add("myProgram/Test/test.txt");
+            GitWrapper.add("myProgram/Hello.txt");
+            String hash = GitWrapper.commit("John Doe", "Initial commit");
             // System.out.println("Commit: " + hash);
             // bw = new BufferedWriter(new FileWriter("myProgram/Test/test.txt", true));
             // bw.write("I am STILL testing this!");
             // bw.close();
             // GitWrapper.add("myProgram/Test/test.txt");
             // GitWrapper.add("myProgram/Hello.txt");
-            // hash = GitWrapper.commit("John Doe", "Second commit");
+            hash = GitWrapper.commit("John Doe", "Second commit");
             // System.out.println("Commit: " + hash);
             // bw = new BufferedWriter(new FileWriter("myProgram/Test/newThing.txt"));
             // bw.write("wow");
