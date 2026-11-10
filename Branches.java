@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 public class Branches {
     public static void restoreHistory(String commit) {
@@ -13,29 +14,60 @@ public class Branches {
             String rootHash = br.readLine();
             rootHash = rootHash.substring(rootHash.indexOf(" ") + 1);
             br.close();
-            deleteRepoFiles("myProgram");
+            // deleteRepoFiles("myProgram");
+            ArrayList<String> oldWorkingList = Git.buildWorkingList();
+            File index = new File("git/index");
+            index.delete();
+            index.createNewFile();
             restoreDirectory("", rootHash);
+            checkRepository("myProgram", getIndexContent(), compileWorkingList(oldWorkingList));
         } catch (Exception e) {
             System.out.println("Error in restoreHistory: " + e.getMessage());
         }
     }
 
-    public static void getIndexFromFile() {
-
-    }
-
-    public static void rewriteIndex() {
-        File index = new File("git/index");
-        try {
-            BufferedWriter indexWriter = new BufferedWriter(new FileWriter(index, true));
-            StringBuilder writeToIndex = new StringBuilder();
-        } catch (Exception e) {
-            System.out.println("Error in rewriteIndex: " + e.getMessage());
+    public static String compileWorkingList(ArrayList<String> workingList) {
+        // Consolidates working list into a single string
+        StringBuilder workingListContents = new StringBuilder();
+        for (String s : workingList) {
+            workingListContents.append(s + "\n");
         }
+        return workingListContents.toString();
     }
 
-    public static String getIndexContents() {
+    public static String getIndexContent() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("git/index"));
+            StringBuilder indexContents = new StringBuilder();
+            while (br.ready()) {
+                indexContents.append(br.readLine());
+            }
+            br.close();
+            return indexContents.toString();
+        } catch (Exception e) {
+            System.out.println("Error in getIndexContent: " + e.getMessage());
+        }
         return "";
+    }
+
+    public static void checkRepository(String dirPath, String indexContent, String oldContent) {
+        // Checks the repository for any files that were staged in the newer commit
+        // But aren't here in the old commit
+
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                checkRepository(files[i].getPath(), indexContent, oldContent);
+            } else {
+                if (oldContent.indexOf(files[i].getPath()) != -1) {
+                    if (indexContent.indexOf(files[i].getPath()) == -1) {
+                        // Staged later
+                        files[i].delete();
+                    }
+                }
+            }
+        }
     }
 
     public static void deleteRepoFiles(String dirPath) {
@@ -56,6 +88,7 @@ public class Branches {
         try {
             BufferedReader br = new BufferedReader(new FileReader("git/objects/" + hash));
             while (br.ready()) {
+                BufferedWriter indexWriter = new BufferedWriter(new FileWriter("git/index", true));
                 String line = br.readLine();
                 if (line.indexOf("blob") != -1) {
                     // BLOB file here
@@ -64,6 +97,8 @@ public class Branches {
                     String fileHash = line.substring(firstSpace + 1, lastSpace);
                     String fileName = line.substring(lastSpace + 1);
                     restoreFile(dirPath + fileName, fileHash);
+                    indexWriter.write(fileHash + " " + dirPath + fileName + "\n");
+                    indexWriter.close();
                 } else if (line.indexOf("tree") != -1) {
                     // tree file
                     int firstSpace = line.indexOf(" ");
@@ -75,6 +110,7 @@ public class Branches {
                     restoreDirectory(dirPath + dirName + "/", dirHash);
                 } else {
                     br.close();
+                    indexWriter.close();
                     throw new IllegalStateException("Something went wrong during tree creation!");
                 }
             }
@@ -135,7 +171,7 @@ public class Branches {
         }
         try {
 
-        } catch (Exception e ) {
+        } catch (Exception e) {
             System.out.println("Error in checkout branch: " + e.getMessage());
         }
     }
