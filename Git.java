@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.ArrayList;
@@ -122,16 +121,13 @@ public class Git {
         String line;
 
         while ((line = indexReader.readLine()) != null) {
-            indexContent.append(line);
             indexContent.append("\n");
+            indexContent.append(line);
         }
-
         indexReader.close();
 
         for (int i = 0; i < filePaths.length; i++) {
             hashes[i] = createBlobs(filePaths[i]);
-            // Here for testing, comment in to check the hashes directly.
-            System.out.println("File hash for " + filePaths[i] + ": " + hashFile(filePaths[i]));
         }
 
         // this HashMap represents the path/hash pair for every file being staged
@@ -147,9 +143,9 @@ public class Git {
         // To do this, I'll first need to parse indexContent into an ArrayList of String
         // arrays
         // each index in the List corresponds to a path/hash pair
-        // the first index in the String array is the file path, the second index is
+        // the first index in the String array is the hash, the second index is
         // that file's
-        // hash
+        // file path
         ArrayList<String[]> entries = parseIndexContent(indexContent);
 
         // Then, I'll loop through the list and check for any files with contradicting
@@ -185,19 +181,15 @@ public class Git {
         // something has
         // been appended to it
 
-        // if (indexContent.length() > 0) {
-        // indexContent.deleteCharAt(indexContent.length() - 1);
-        // }
-
         BufferedWriter bw = new BufferedWriter(new FileWriter("git/index"));
-
-        System.out.println(indexContent.toString());
-
+        String indexString = indexContent.toString();
+        if (indexString.length() > 0) {
+            indexString = indexString.substring(1);
+        }
         // write in indexContent before staging new files
-        bw.write(indexContent.toString());
+        bw.write(indexString);
 
         for (int i = 0; i < filePaths.length; i++) {
-
             // before staging the file check to make sure that it hasn't already been staged
             // and
             // that it's not already inside of index
@@ -206,7 +198,10 @@ public class Git {
             if (!willFileBeStaged(stagedFiles, indexContent.toString(), relativeFilePaths[i])) {
                 continue;
             } else {
-                bw.write(hashes[i] + " " + relativeFilePaths[i] + "\n");
+                if (!indexContent.toString().equals("")) {
+                    bw.write("\n");
+                }
+                bw.write(hashes[i] + " " + relativeFilePaths[i]);
                 stagedFiles.add(relativeFilePaths[i]);
             }
 
@@ -221,7 +216,7 @@ public class Git {
     // file before staging and the file path
     public static boolean willFileBeStaged(ArrayList<String> stagedFiles, String indexContent,
             String filePath) {
-        if (indexContent.contains(" " + filePath + "\n")) {
+        if (indexContent.contains(" " + filePath)) {
             return false;
         } else if (stagedFiles.contains(filePath)) {
             return false;
@@ -275,9 +270,6 @@ public class Git {
 
             // append the second index of the current entry (path) array to indexContent
             indexContent.append(entries.get(i)[1]);
-
-            // append a new line to indexContent
-            indexContent.append("\n");
         }
 
         return indexContent;
@@ -610,7 +602,6 @@ public class Git {
         // sort workingList again
         sortWorkingList(workingList);
     }
-
 
     public static void testGit() throws IOException {
         System.out.println("== Initial set up ==");
