@@ -1,4 +1,6 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class GitWrapper {
@@ -62,7 +64,19 @@ public class GitWrapper {
         for (File object : commits) {
             if (object.getName().equals(commitHash)) {
                 Branches.checkoutCommit(commitHash);
+                return;
             }
+        }
+
+        // If we've reached this point, the input is neither a branch nor a commit
+        // Create a new branch and switch to it!
+        createBranch(commitHash);
+        try {
+            BufferedWriter headWriter = new BufferedWriter(new FileWriter("git/HEAD"));
+            headWriter.write("ref: refs/heads/" + commitHash);
+            headWriter.close();
+        } catch (Exception e) {
+            System.out.println("Error creating a branch in checkout! " + e.getMessage());
         }
     }
 

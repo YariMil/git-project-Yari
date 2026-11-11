@@ -43,10 +43,15 @@ public class GitTester {
             // Branches.checkoutBranch("main");
             // Branches.checkoutBranch("feature");
             // GitWrapper.checkout("1d29b1659f39a950278214adf8669f531260f4c3");
+            // GitWrapper.add("myProgram/b.txt");
+            // GitWrapper.commit("Yari", "Added b.txt!");
             // GitWrapper.add("myProgram/a.txt");
             // GitWrapper.commit("Yari", "Detached commit!");
             // GitWrapper.add("myProgram/a.txt");
-            GitWrapper.checkout("feature");
+            GitWrapper.checkout("main");
+            // This branch doesn't exist but should create a new branch
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.commit("Yari", "Java!");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
