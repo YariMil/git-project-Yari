@@ -81,6 +81,9 @@ public class GitWrapper {
     }
 
     public static void createBranch(String branchName) {
+        if (Branches.isCreatedBranch(branchName)) {
+            throw new IllegalStateException("This branch was already created!");
+        }
         Branches.createBranch(branchName);
     }
 

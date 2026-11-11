@@ -20,9 +20,24 @@ public class Branches {
             index.delete();
             index.createNewFile();
             restoreDirectory("", rootHash);
+            deleteLastNewLine();
             checkRepository("myProgram", getIndexContent(), compileWorkingList(oldWorkingList));
         } catch (Exception e) {
             System.out.println("Error in restoreHistory: " + e.getMessage());
+        }
+    }
+
+    public static void deleteLastNewLine() {
+        try {
+            String indexContent = getIndexContent();
+            BufferedWriter bw = new BufferedWriter(new FileWriter("git/index"));
+            if (indexContent.length() > 0 && indexContent.charAt(indexContent.length() - 1) == '\n') {
+                indexContent = indexContent.substring(0, indexContent.length() - 1);
+            }
+            bw.write(indexContent);
+            bw.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong in deleteLastNewLine: " + e.getMessage());
         }
     }
 
@@ -40,7 +55,7 @@ public class Branches {
             BufferedReader br = new BufferedReader(new FileReader("git/index"));
             StringBuilder indexContents = new StringBuilder();
             while (br.ready()) {
-                indexContents.append(br.readLine());
+                indexContents.append(br.readLine() + "\n");
             }
             br.close();
             return indexContents.toString();
@@ -154,6 +169,9 @@ public class Branches {
         String currHash = getCurrentCommitHash();
         try {
             BufferedWriter branchWriter = new BufferedWriter(new FileWriter("git/refs/heads/" + newBranch));
+            if (currHash.equals("null")) {
+                currHash = "";
+            }
             branchWriter.write(currHash);
             branchWriter.close();
         } catch (Exception e) {
@@ -171,7 +189,10 @@ public class Branches {
             headWriter.write("ref: refs/heads/" + branch);
             headWriter.close();
             String currHash = getCurrentCommitHash();
-            restoreHistory(currHash);
+            if (!currHash.equals("null")) {
+                restoreHistory(currHash);
+            }
+            // If the hash is null nothing has been committed yet so don't do anything
         } catch (Exception e) {
             System.out.println("Error in checkout branch: " + e.getMessage());
         }

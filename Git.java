@@ -187,14 +187,9 @@ public class Git {
         // something has
         // been appended to it
 
-        // if (indexContent.length() > 0) {
-        // indexContent.deleteCharAt(indexContent.length() - 1);
-        // }
-
         BufferedWriter bw = new BufferedWriter(new FileWriter("git/index"));
 
         // write in indexContent before staging new files
-        bw.write(indexContent.toString());
 
         for (int i = 0; i < filePaths.length; i++) {
 
@@ -206,11 +201,15 @@ public class Git {
             if (!willFileBeStaged(stagedFiles, indexContent.toString(), relativeFilePaths[i])) {
                 continue;
             } else {
-                bw.write(hashes[i] + " " + relativeFilePaths[i] + "\n");
+                indexContent.append(hashes[i] + " " + relativeFilePaths[i]);
                 stagedFiles.add(relativeFilePaths[i]);
             }
 
         }
+        if (indexContent.length() > 0 && indexContent.toString().charAt(indexContent.length() - 1) == '\n') {
+            indexContent.deleteCharAt(indexContent.length() - 1);
+        }
+        bw.write(indexContent.toString());
         bw.close();
     }
 

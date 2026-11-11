@@ -37,16 +37,19 @@ public class GitTester {
             // GitWrapper.add("myProgram/a.txt");
             // GitWrapper.commit("Yari", "Commit 1");
             // GitWrapper.createBranch("feature");
-            // Branches.checkoutBranch("feature");
+            // GitWrapper.checkout("feature");
             // GitWrapper.add("myProgram/a.txt");
             // GitWrapper.commit("Yari", "Added new feature");
-            // Branches.checkoutBranch("main");
-            // Branches.checkoutBranch("feature");
-            // GitWrapper.checkout("1d29b1659f39a950278214adf8669f531260f4c3");
+            // GitWrapper.checkout("main");
+            // GitWrapper.checkout("feature");
+            // GitWrapper.checkout("798f8cda69aa822e06285547a26475ea51329b8e");
             // GitWrapper.add("myProgram/b.txt");
+            // GitWrapper.add("myProgram/c.txt");
+            // GitWrapper.commit("Yari", "Added d.txt");
             // GitWrapper.commit("Yari", "Added b.txt!");
             // GitWrapper.add("myProgram/a.txt");
-            // GitWrapper.commit("Yari", "Detached commit!");
+            // GitWrapper.add("myProgram/e.txt");
+            // GitWrapper.commit("Yari", "changed a!");
             // GitWrapper.add("myProgram/a.txt");
             GitWrapper.checkout("main");
             // This branch doesn't exist but should create a new branch
