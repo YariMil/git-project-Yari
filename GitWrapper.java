@@ -58,4 +58,8 @@ public class GitWrapper {
         Branches.restoreHistory(commitHash);
     }
 
+    public static void createBranch(String branchName) {
+        Branches.createBranch(branchName);
+    }
+
 }

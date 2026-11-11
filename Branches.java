@@ -155,10 +155,7 @@ public class Branches {
         try {
             BufferedWriter branchWriter = new BufferedWriter(new FileWriter("git/refs/heads/" + newBranch));
             branchWriter.write(currHash);
-            BufferedWriter headWriter = new BufferedWriter(new FileWriter("git/HEAD"));
-            headWriter.write("ref: refs/heads/" + newBranch);
             branchWriter.close();
-            headWriter.close();
         } catch (Exception e) {
             System.out.println("Error in createBranch: " + e.getMessage());
         }
@@ -170,7 +167,11 @@ public class Branches {
             throw new IllegalStateException("Branch hasn't been created!");
         }
         try {
-
+            BufferedWriter headWriter = new BufferedWriter(new FileWriter("git/HEAD"));
+            headWriter.write("ref: refs/heads/" + branch);
+            headWriter.close();
+            String currHash = getCurrentCommitHash();
+            restoreHistory(currHash);
         } catch (Exception e) {
             System.out.println("Error in checkout branch: " + e.getMessage());
         }

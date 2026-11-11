@@ -37,9 +37,11 @@ public class Git {
             File gitHead = new File("git/HEAD");
             boolean headExists = !gitHead.createNewFile();
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter("git/HEAD"));
-                bw.write("ref: refs/heads/main");
-                bw.close();
+                if (!headExists) {
+                    BufferedWriter bw = new BufferedWriter(new FileWriter("git/HEAD"));
+                    bw.write("ref: refs/heads/main");
+                    bw.close();
+                }
             } catch (Exception e) {
                 System.out.println("Error with writing in HEAD in init: " + e.getMessage());
             }
@@ -190,7 +192,6 @@ public class Git {
         // }
 
         BufferedWriter bw = new BufferedWriter(new FileWriter("git/index"));
-
 
         // write in indexContent before staging new files
         bw.write(indexContent.toString());
@@ -608,7 +609,6 @@ public class Git {
         // sort workingList again
         sortWorkingList(workingList);
     }
-
 
     public static void testGit() throws IOException {
         System.out.println("== Initial set up ==");
