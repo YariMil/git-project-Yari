@@ -97,7 +97,7 @@ public class Branches {
                     String fileHash = line.substring(firstSpace + 1, lastSpace);
                     String fileName = line.substring(lastSpace + 1);
                     restoreFile(dirPath + fileName, fileHash);
-                    indexWriter.write(fileHash + " " + dirPath + fileName + "\n");
+                    indexWriter.write(fileHash + " " + "git-project-Yari/" + dirPath + fileName + "\n");
                     indexWriter.close();
                 } else if (line.indexOf("tree") != -1) {
                     // tree file
@@ -186,5 +186,18 @@ public class Branches {
             }
         }
         return false;
+    }
+
+    public static void checkoutCommit(String commitHash) {
+        // Creates a detached head commit
+        File gitHead = new File("git/HEAD");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(gitHead));
+            bw.write(commitHash);
+            bw.close();
+            restoreHistory(commitHash);
+        } catch (Exception e) {
+            System.out.println("Error in checkoutCommit: " + e.getMessage());
+        }
     }
 }

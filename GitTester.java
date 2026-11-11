@@ -41,7 +41,12 @@ public class GitTester {
             // GitWrapper.add("myProgram/a.txt");
             // GitWrapper.commit("Yari", "Added new feature");
             // Branches.checkoutBranch("main");
-            Branches.checkoutBranch("feature");
+            // Branches.checkoutBranch("feature");
+            // GitWrapper.checkout("1d29b1659f39a950278214adf8669f531260f4c3");
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.commit("Yari", "Detached commit!");
+            // GitWrapper.add("myProgram/a.txt");
+            GitWrapper.checkout("feature");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

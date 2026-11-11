@@ -1163,11 +1163,16 @@ public class Git {
         createBlobs("commitContents");
 
         commitFile.delete();
-
-        FileWriter headWriter = new FileWriter("git/" + currBranch);
-        headWriter.write(commitHash);
-        headWriter.close();
-
+        if (!currBranch.equals("null")) {
+            FileWriter headWriter = new FileWriter("git/" + currBranch);
+            headWriter.write(commitHash);
+            headWriter.close();
+        } else {
+            // Detached head, update the head only F
+            FileWriter headWriter = new FileWriter("git/HEAD");
+            headWriter.write(commitHash);
+            headWriter.close();
+        }
         return commitHash;
     }
 
@@ -1175,6 +1180,11 @@ public class Git {
         try {
             BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
             String refBranch = headReader.readLine();
+            if (refBranch.indexOf("ref") == -1) {
+                // detached head, return a null branch and the commit
+                headReader.close();
+                return "null " + refBranch;
+            }
             int spaceIndex = refBranch.indexOf(" ");
             String currBranch = refBranch.substring(spaceIndex + 1);
             BufferedReader branchReader = new BufferedReader(new FileReader("git/" + currBranch));
