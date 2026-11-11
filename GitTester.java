@@ -1,26 +1,63 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GitTester {
     public static void main(String[] args) throws IOException {
         GitWrapper.init();
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("TestingDirectory/Test/test.txt"));
-            bw.write("I am testing this!");
-            bw.close();
-            GitWrapper.add("TestingDirectory/Test/test.txt");
-            GitWrapper.add("TestingDirectory/Hello.txt");
-            bw = new BufferedWriter(new FileWriter("TestingDirectory/Test/test.txt", true));
-            bw.write("I am STILL testing this!");
-            bw.close();
-            GitWrapper.add("TestingDirectory/Test/test.txt");
-            GitWrapper.add("TestingDirectory/Hello.txt");
+            // System.out.println(Git.getBranchAndHash());
+            // BufferedWriter bw = new BufferedWriter(new
+            // FileWriter("myProgram/Test/test.txt"));
+            // bw.write("I am testing this!");
+            // bw.close();
+            // GitWrapper.add("myProgram/Test/test.txt");
+            // GitWrapper.add("myProgram/Hello.txt");
+            // String hash = GitWrapper.commit("John Doe", "Initial commit");
+            // System.out.println("Commit: " + hash);
+            // bw = new BufferedWriter(new FileWriter("myProgram/Test/test.txt", true));
+            // bw.write("I am STILL testing this!");
+            // bw.close();
+            // GitWrapper.add("myProgram/Test/test.txt");
+            // GitWrapper.add("myProgram/Hello.txt");
+            // GitWrapper.add("myProgram/Test/wow.txt");
+            // hash = GitWrapper.commit("John Doe", "Second commit");
+            // String currCommit = Branches.getCurrentCommitHash();
+            // BufferedReader branchReader = new BufferedReader(new
+            // FileReader("git/objects/" + currCommit));
+            // branchReader.readLine();
+            // String oldCommit = branchReader.readLine();
+            // oldCommit = oldCommit.substring(oldCommit.indexOf(" ") + 1);
+            // branchReader.close();
+            // GitWrapper.checkout(oldCommit);
+            // GitWrapper.checkout(currCommit);
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.commit("Yari", "Commit 1");
+            // GitWrapper.createBranch("feature");
+            // GitWrapper.checkout("feature");
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.commit("Yari", "Added new feature");
+            // GitWrapper.checkout("main");
+            // GitWrapper.checkout("feature");
+            // GitWrapper.checkout("798f8cda69aa822e06285547a26475ea51329b8e");
+            // GitWrapper.add("myProgram/b.txt");
+            // GitWrapper.add("myProgram/c.txt");
+            // GitWrapper.commit("Yari", "Added d.txt");
+            // GitWrapper.commit("Yari", "Added b.txt!");
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.add("myProgram/e.txt");
+            // GitWrapper.commit("Yari", "changed a!");
+            // GitWrapper.add("myProgram/a.txt");
+            GitWrapper.checkout("main");
+            // This branch doesn't exist but should create a new branch
+            // GitWrapper.add("myProgram/a.txt");
+            // GitWrapper.commit("Yari", "Java!");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        String hash = GitWrapper.commit("John Doe", "Initial commit");
-        System.out.println("Commit: " + hash);
 
     }
 }

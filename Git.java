@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.ArrayList;
@@ -35,7 +36,20 @@ public class Git {
             boolean indexExists = !gitIndex.createNewFile();
             File gitHead = new File("git/HEAD");
             boolean headExists = !gitHead.createNewFile();
-            if (rootExists && objectsExists && indexExists && headExists) {
+            try {
+                if (!headExists) {
+                    BufferedWriter bw = new BufferedWriter(new FileWriter("git/HEAD"));
+                    bw.write("ref: refs/heads/main");
+                    bw.close();
+                }
+            } catch (Exception e) {
+                System.out.println("Error with writing in HEAD in init: " + e.getMessage());
+            }
+            File gitRefs = new File("git/refs/heads/main");
+            new File("git/refs").mkdir();
+            new File("git/refs/heads").mkdir();
+            boolean refsExists = !gitRefs.createNewFile();
+            if (rootExists && objectsExists && indexExists && headExists && refsExists) {
                 System.out.println("Git Repository already exists.");
             } else {
                 System.out.println("Git Repository created.");
@@ -119,7 +133,6 @@ public class Git {
         for (int i = 0; i < filePaths.length; i++) {
             hashes[i] = createBlobs(filePaths[i]);
             // Here for testing, comment in to check the hashes directly.
-            System.out.println("File hash for " + filePaths[i] + ": " + hashFile(filePaths[i]));
         }
 
         // this HashMap represents the path/hash pair for every file being staged
@@ -173,16 +186,9 @@ public class Git {
         // something has
         // been appended to it
 
-        // if (indexContent.length() > 0) {
-        // indexContent.deleteCharAt(indexContent.length() - 1);
-        // }
-
         BufferedWriter bw = new BufferedWriter(new FileWriter("git/index"));
 
-        System.out.println(indexContent.toString());
-
         // write in indexContent before staging new files
-        bw.write(indexContent.toString());
 
         for (int i = 0; i < filePaths.length; i++) {
 
@@ -194,12 +200,15 @@ public class Git {
             if (!willFileBeStaged(stagedFiles, indexContent.toString(), relativeFilePaths[i])) {
                 continue;
             } else {
-                bw.write(hashes[i] + " " + relativeFilePaths[i] + "\n");
+                indexContent.append(hashes[i] + " " + relativeFilePaths[i]);
                 stagedFiles.add(relativeFilePaths[i]);
             }
 
         }
-
+        if (indexContent.length() > 0 && indexContent.toString().charAt(indexContent.length() - 1) == '\n') {
+            indexContent.deleteCharAt(indexContent.length() - 1);
+        }
+        bw.write(indexContent.toString());
         bw.close();
     }
 
@@ -1125,15 +1134,16 @@ public class Git {
             return "";
         }
 
-        BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
-        String parentHash = headReader.readLine();
-        headReader.close();
+        String hashAndCommit = getBranchAndHash();
+        String[] stringParts = hashAndCommit.split(" ");
+        String currBranch = stringParts[0];
+        String parentHash = stringParts[1];
 
         StringBuilder commitContents = new StringBuilder();
 
         commitContents.append("tree: " + rootTreeHash + "\n");
 
-        if (parentHash != null && !parentHash.equals("")) {
+        if (!parentHash.equals("null") && !parentHash.equals("")) {
             commitContents.append("parent: " + parentHash + "\n");
         }
 
@@ -1151,12 +1161,40 @@ public class Git {
         createBlobs("commitContents");
 
         commitFile.delete();
-
-        FileWriter headWriter = new FileWriter("git/HEAD");
-        headWriter.write(commitHash);
-        headWriter.close();
-
+        if (!currBranch.equals("null")) {
+            FileWriter headWriter = new FileWriter("git/" + currBranch);
+            headWriter.write(commitHash);
+            headWriter.close();
+        } else {
+            // Detached head, update the head only F
+            FileWriter headWriter = new FileWriter("git/HEAD");
+            headWriter.write(commitHash);
+            headWriter.close();
+        }
         return commitHash;
     }
 
+    public static String getBranchAndHash() {
+        try {
+            BufferedReader headReader = new BufferedReader(new FileReader("git/HEAD"));
+            String refBranch = headReader.readLine();
+            if (refBranch.indexOf("ref") == -1) {
+                // detached head, return a null branch and the commit
+                headReader.close();
+                return "null " + refBranch;
+            }
+            int spaceIndex = refBranch.indexOf(" ");
+            String currBranch = refBranch.substring(spaceIndex + 1);
+            BufferedReader branchReader = new BufferedReader(new FileReader("git/" + currBranch));
+            String parentHash = branchReader.readLine();
+            headReader.close();
+            branchReader.close();
+            // Returning both the branch name and the commit hash. The branch name is used
+            // in commit
+            return currBranch + " " + parentHash;
+        } catch (Exception e) {
+            System.out.println("Error in getCurrentCommitHash: " + e.getMessage());
+        }
+        return "";
+    }
 }
