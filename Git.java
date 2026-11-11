@@ -133,7 +133,6 @@ public class Git {
         for (int i = 0; i < filePaths.length; i++) {
             hashes[i] = createBlobs(filePaths[i]);
             // Here for testing, comment in to check the hashes directly.
-            System.out.println("File hash for " + filePaths[i] + ": " + hashFile(filePaths[i]));
         }
 
         // this HashMap represents the path/hash pair for every file being staged
